@@ -8,20 +8,17 @@ import * as ImagePicker from 'expo-image-picker';
 import { useMutation, useQuery } from 'react-query';
 import { addProduct, getCategories } from '../../data/api';
 import mime from "mime";
-
+import {useSelector} from 'react-redux'
+import { AuthDialog } from '../../components/AuthDialog';
 let imagesArray = [];
 
 
 
 
 
-export default function AddProductScreen() {
+export default function AddProductScreen({navigation}) {
 
-  const mutation = useMutation(addProduct,{
-    onSuccess:(data)=>{
-      alert(JSON.stringify(data))
-    }
-  })
+
     const [service,setService] = useState("");
     const [condition,setCondition] = useState("");
     const [product,setProduct] = useState("");
@@ -32,8 +29,21 @@ export default function AddProductScreen() {
     const [images,setImages] = useState([]);
     const [image, setImage] = useState(null);
     const [_images, set_Image] = useState([]);
+    const [isOpen,setIsOpen] = useState(false);
 
 
+    const mutation = useMutation(addProduct,{
+      onSuccess:(data)=>{
+        setPrice("")
+        setCategory("")
+        setDescription("")
+        setProduct("")
+
+        navigation.navigate("MyProduct");
+      }
+    })
+
+	  let user = useSelector(state=>state.user)
 
     const {isLoading,data:categories} = useQuery("categories",getCategories);
 
@@ -62,17 +72,11 @@ export default function AddProductScreen() {
         let type = mime.getType(localUri);//match ? `image/${match[1]}` : `image`;
 
         console.log("typeee",(filename))
-        // Upload the image using the fetch and FormData APIs
-        // console.log('photo', { uri: localUri, originalname: filename, type });
 
 
         let im = { uri: localUri,name:filename, type };
         
-        // console.log(im)
-        // formData.append("img",im);
 
-        // var file = dataURLtoFile(localUri, filename);
-        // console.log("===files==",file);
 
         formData.append("img[]",im)
         set_Image(p=>[...p,im]);
@@ -89,14 +93,6 @@ export default function AddProductScreen() {
       }
     };
 
-//     function dataURLtoFile(dataurl, filename) {
-//       var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-//       bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-//       while(n--){
-//           u8arr[n] = bstr.charCodeAt(n);
-//       }
-//     return new File([u8arr], filename, {type:mime});
-// }
 
     const handleSave = ()=>{
       let data = {name:product,category,price,condition,quantity,img:_images}
@@ -112,14 +108,16 @@ export default function AddProductScreen() {
       formData.append("category",category);
       formData.append("description",description);
 
-      
-      mutation.mutate(formData);
+      mutation.mutate({token:user.token,data:formData});
     }
 
 
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+
+    <AuthDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+
     <Box flex={1} w='full' bg='white'>
         <Box  p={4} bg='white'>
 
@@ -127,7 +125,7 @@ export default function AddProductScreen() {
                 <Input 
                 _focus={{bg:"white"}}
                 bg='white'
-                fontSize={14}
+                fontSize={16}
                 placeholder="Enter product name"
                 value={product}
                 onChangeText={text=>setProduct(text)}
@@ -135,9 +133,6 @@ export default function AddProductScreen() {
 
             </Box>
 
-            <Box>
-              {/* {""+JSON.stringify(_images)} */}
-            </Box>
 
             <Box p={2}>
                 <Input 
@@ -146,6 +141,7 @@ export default function AddProductScreen() {
                 fontSize={18}
                 placeholder="Enter product price"
                 value={price}
+                keyboardType='numeric'
                 onChangeText={text=>setPrice(text)}
                 />
 
@@ -157,6 +153,7 @@ export default function AddProductScreen() {
                 _focus={{bg:"white"}}
                 bg='white'
                 fontSize={18}
+                keyboardType='numeric'
                 placeholder="Enter product quantity"
                 value={quantity}
                 onChangeText={text=>setQuantity(text)}
@@ -165,13 +162,14 @@ export default function AddProductScreen() {
             </Box>
 
 
-            {/* <Box>{"images "+JSON.stringify(images)}</Box> */}
             <Box p={2}>
             <Select 
-                size={18}
+                fontSize={18}
                 _focus={{bg:'white'}}
                 bg='white' 
-                selectedValue={condition} minWidth="200" accessibilityLabel="Choose product category" placeholder="Choose Category" _selectedItem={{
+                selectedValue={condition} minWidth="200" 
+                accessibilityLabel="Choose product category" 
+                placeholder="Product Status" _selectedItem={{
                         bg: "teal.600",
                         endIcon: <CheckIcon size="5" />
                         }} mt={1} 
@@ -182,15 +180,14 @@ export default function AddProductScreen() {
                 </Select>
             </Box>
 
-
             <Box p={2}>
                 <Select 
                 fontSize={18}
                 _focus={{bg:'white'}}
                 bg='white' 
                 selectedValue={category} minWidth="200" 
-                accessibilityLabel="Choose Status" 
-                placeholder="Choose Status" _selectedItem={{
+                accessibilityLabel="Product Category" 
+                placeholder="Product Category" _selectedItem={{
             bg: "teal.600",
             endIcon: <CheckIcon size="5" />
         }} mt={1} onValueChange={itemValue => setCategory(itemValue)}>
@@ -223,17 +220,9 @@ export default function AddProductScreen() {
                   m={2}
                   onPress={pickImage}
                   >    
-           
                     <Text color='gray.400'>Pick Image</Text>
-
-                    {/* <Button title="Pick an image from camera roll" onPress={pickImage} /> */}
-{/*                     
-    </View> */}
                     
             </Pressable>
-
-
-            {/* {image && <Image  alt='my images' source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
 
 
             <FlatList

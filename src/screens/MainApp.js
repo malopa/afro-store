@@ -1,5 +1,5 @@
 import { Box, Heading, Icon, Input, VStack } from 'native-base'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
 import CartScreen from './CartScreen';
@@ -8,14 +8,18 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
+import SearchItem from '../components/SearchItems';
+import { SearchContext } from '../context/SearchContext';
+import ServiceScreen from './ServiceScreen';
 
 const Tab = createBottomTabNavigator();
 
 export default function MainApp({navigation}) {
 
+  const {clicked,setClicked,searchPhrase, setSearchPhrase} = useContext(SearchContext);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', (e) => {
-      
       e.preventDefault();
       
     });
@@ -29,19 +33,17 @@ export default function MainApp({navigation}) {
       activeColor="#f0edf6"
       inactiveColor="#3e2465"
       headerShown={false}
-      barStyle={{ paddingBottom: 4 }}
+      barStyle={{ paddingBottom: 4,height: 80 }}
 
       screenOptions={{
         tabBarStyle: { position: 'absolute' },
         tabBarActiveTintColor: '#ffed62',
-        
       }}
 
       tabContainerStyle={{
         elevation:0,
         shadowColor:"none"
       }}
-
     >
       <Tab.Screen name="Home" component={HomeScreen} 
       options={{
@@ -53,8 +55,8 @@ export default function MainApp({navigation}) {
         
       }}
 
-
-       />
+      />
+      
       <Tab.Screen name="Cart" component={CartScreen} 
       options={{
         title:"",
@@ -69,16 +71,25 @@ export default function MainApp({navigation}) {
         ),
         headerRight:()=>(
           <VStack alignSelf="center" w='90%' rounded='md'>
-        <Input placeholder="Search Prooduct here" width="100%" 
-        borderRadius="4" py="2" px="1" 
-        fontSize="14" 
-        _focus={{bg:'white',borderColor:'amber.400'}}
-        InputLeftElement={<Icon m="2" ml="2" size="6" 
-        color="gray.400" as={<MaterialIcons name="search" />} />} 
-        InputRightElement={<Icon m="2" mr="3" size="6" color="gray.400" 
-        as={<MaterialIcons name="mic" />} />} />
+            <SearchItem
+            searchPhrase={searchPhrase}
+            setSearchPhrase={setSearchPhrase}
+            clicked={clicked}
+            setClicked={setClicked}
+          />
+
+       
       </VStack>
         )
+      }}
+      />
+
+    <Tab.Screen name="Service" component={ServiceScreen} 
+       options={{
+        tabBarLabel: 'Service',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="server" color={color} size={26} />
+        ),
       }}
       />
 

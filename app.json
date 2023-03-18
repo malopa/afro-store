@@ -25,14 +25,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.quicker.store"
+      "package": "com.quicker.store",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "502441f1-e456-45d3-8be3-a3c5b8c3e081"
+        "projectId": "19af7fb1-47a3-4cdd-827d-de050f58ab85"
       }
     },
     "plugins": [

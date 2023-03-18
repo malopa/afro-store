@@ -10,6 +10,7 @@ import {
 import { Provider } from 'react-redux';
 import { persistor, store } from './src/screens/store';
 import { PersistGate } from 'redux-persist/lib/integration/react';
+import { SearchContextProvider } from './src/context/SearchContext';
 
 const queryClient = new QueryClient()
 
@@ -21,7 +22,9 @@ export default function App() {
         <NativeBaseProvider>
           <NavigationContainer>
           <QueryClientProvider client={queryClient}>
-            <AppScreens />
+            <SearchContextProvider>
+              <AppScreens />
+            </SearchContextProvider>
             </QueryClientProvider>
           </NavigationContainer>
         </NativeBaseProvider>

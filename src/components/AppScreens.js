@@ -8,6 +8,9 @@ import ShoperScreen from '../screens/ShoperScreen';
 import AddProductScreen from '../screens/Products/AddProductScreen';
 import SignupScreen from '../screens/SignupScreen';
 import MyProductScreen from '../screens/Products/MyProductScreen';
+import EditUserScreen from '../screens/EditUser';
+import EditProductScreen from '../screens/EditProductScreen';
+import QuickSignup from '../screens/QuickSignup';
 
 
 
@@ -54,6 +57,34 @@ export default function AppScreens({navigation}) {
         } />
 
 
+        <Stack.Screen name='EditUserScreen' 
+        component={EditUserScreen} 
+          options={({route})=>({title:"Edit User",
+            headerShown:true,
+            headerStyle:{
+              elevation:0,
+              borderBottomWidth:0,
+              shadowColor:'none'
+            }
+          })
+          } 
+          />
+
+
+        <Stack.Screen name='EditProductScreen' 
+        component={EditProductScreen} 
+          options={({route})=>({title:"Edit Product",
+            headerShown:true,
+            headerStyle:{
+              elevation:0,
+              borderBottomWidth:0,
+              shadowColor:'none'
+            }
+          })
+          } 
+          />
+
+
         <Stack.Screen name='SignUp' 
         component={SignupScreen} 
         options={({route})=>({title:"Sign up",
@@ -66,9 +97,8 @@ export default function AppScreens({navigation}) {
         })
         } />
 
-
-<Stack.Screen name='MyProduct' 
-        component={MyProductScreen} 
+        <Stack.Screen name='QuickSignup' 
+        component={QuickSignup} 
         options={({route})=>({title:"Sign up",
           headerShown:false,
           headerStyle:{
@@ -78,7 +108,14 @@ export default function AppScreens({navigation}) {
           }
         })
         } />
+
+
+    <Stack.Screen name='MyProduct' 
+        component={MyProductScreen} 
+        options={({route})=>({title:"My Products"})} />
     </Stack.Navigator>
+
+   
    
   )
 

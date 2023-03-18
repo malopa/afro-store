@@ -1,10 +1,13 @@
 import 'react-native-gesture-handler';
 import { Box,Image,FlatList, Center, Icon, Text, ScrollView, Pressable, HStack } from 'native-base'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ImageSlider } from "react-native-image-slider-banner";
 import { categories } from '../data/data';
 import { useSelector } from 'react-redux';
+import { getMyPost, getProducts } from '../data/api';
+import { useQuery } from 'react-query';
+import { ActivityIndicator } from 'react-native';
 
 
 const data = [
@@ -17,32 +20,55 @@ const data = [
   {id:7,name:"watch ahoewa one sneaker equalizer",price:2000,img:require('../assets/pic1.jpeg')},
   {id:8,name:"watch ahoewa  the helena or the later",price:2000,img:require('../assets/pic1.jpeg')},
 ];
+
 export default function MainScreen({navigation}) {
 
-  const [images,setImages] = useState(
-    [
-      "https://source.unsplash.com/1024x768/?nature",
-      "https://source.unsplash.com/1024x768/?water",
-      "https://source.unsplash.com/1024x768/?girl",
-      "https://source.unsplash.com/1024x768/?tree", // Network image
-      require('../assets/pic1.jpeg')
-      
-    ]
-  )
+  
+  // const {isLoading,data:posts} = useQuery({queryKey:['products'], queryFn:()=>getProducts()})
 
 
   const user = useSelector(state=>state.user);
+  const [refreshing,setRefreshing] = useState(false)
+  const [loading,setLoading] = useState(false)
+  const [loading1,setLoading1] = useState(false)
+  const [posts,setPost] = useState([])
+  const [limit,setLimit] = useState(20)
+  const [skip,setSkip] = useState(0)
 
 
-  // const categories = [
-  //   {id:1,name:"Electrinics"},
-  //   {id:2,name:"Clothes & jewels"},
-  //   {id:3,name:"Cars"},
-  //   {id:4,name:"Real Estate"},
-  //   {id:4,name:"Real Estate"},
-  //   {id:4,name:"Real Estate"},
-  // ]
+  useEffect(()=>{
+    setLoading1(true)
+    getProducts(limit,skip)
+    .then(res=>{
+      setPost(res)
+      if(res.data.length == 0){
+        setSkip(0)
+        retrieveMore()
+      }
+      setLoading1(false)
 
+    })
+  },[])
+
+  const retrieveMore = ()=>{
+    setLoading(true)
+    setSkip(s=>+s + limit)
+
+    setRefreshing(!refreshing)
+
+    getProducts(limit,skip)
+    .then(res=>{
+      if(res.data.length == 0){
+        // alert(res.data.length)
+        setSkip(0)
+        // retrieveMore()
+      }
+
+      setPost(res)
+      setLoading(false)
+
+    })
+  }
 
   const renderCategoriesItem = ({item})=>{
     return <Box m={2} bg='white' rounded='sm' w={150} p={2} mx={4} borderWidth={1} 
@@ -53,12 +79,13 @@ export default function MainScreen({navigation}) {
 
   const renderItem = ({item})=>{
     return <Pressable w={'49%'} m={1} bg='white' rounded={'md'}
-    onPress={()=>navigation.navigate("ProductDetails",{title:item.name,img:item.img})}>
+    onPress={()=>navigation.navigate("ProductDetails",{title:item.name,id:item._id,img:item?.image[0]})}>
       <Center p={2} alignItems='center'  h={250} flex={1} >
       <Box position={"relative"} py={1} my={1}
       bg="white" borderBottomColor={'orange.300'} >
         <Box bg='gray.10' p={2} rounded='md' w='98%'>
-          <Image resizeMode='cover' source={item.img} w={136} alt={''} 
+          <Image resizeMode='cover' 
+          source={{uri:item?.image[0]}} w={136} alt={''} 
           bg='gray.300' m={1} h={150} />
           <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
           position={"absolute"} right={10} 
@@ -86,9 +113,29 @@ export default function MainScreen({navigation}) {
     </Box> 
   }
 
+
+  const renderFooter = () => {
+    try {
+      // Check If Loading
+      if (loading) {
+        return (<Box>
+          <ActivityIndicator />
+        </Box>
+        )
+      }
+      else {
+        return null;
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Box p={2}>
       <Box h={200}>
+
         <ImageSlider 
             data={[
                 {img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5a5uCP-n4teeW2SApcIqUrcQApev8ZVCJkA&usqp=CAU'},
@@ -102,20 +149,27 @@ export default function MainScreen({navigation}) {
         /> 
       </Box>
 
-            
 
+            
+      {loading1?<ActivityIndicator />:  
       <FlatList bg='gray.100' w={"full"}
-      ListHeaderComponent={HeaderTop}
-      renderItem={renderItem}
-      data={data}
-      keyExtractor={item => item.id}
-      numColumns={2}
-      showsVerticalScrollIndicator={false}
-      _contentContainerStyle={{
-        paddingBottom:100
-      }}
+        ListHeaderComponent={HeaderTop}
+        renderItem={renderItem}
+        data={posts?.data}
+        keyExtractor={item => item._id}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        _contentContainerStyle={{
+          paddingBottom:100
+        }}
+
+        onEndReachedThreshold={0}
+        // Refreshing (Set To True When End Reached)
+        ListFooterComponent={renderFooter}
+        refreshing={refreshing}
+        onEndReached={retrieveMore}
       /> 
-{/* </ScrollView>       */}
+    }
     </Box>
   )
 }

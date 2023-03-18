@@ -1,11 +1,15 @@
+import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 import { Box,Image,FlatList, Center, Icon, Text } from 'native-base'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Pressable } from 'react-native';
 // import {  } from 'react-native';
 // import { SliderBox } from 'react-native-image-slider-box'
 
 // import { SliderBox } from "react-native-image-slider-box";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useQuery } from 'react-query';
+import { SearchContext } from '../context/SearchContext';
+import { getProducts } from '../data/api';
 
 
 
@@ -21,63 +25,83 @@ const data = [
 ];
 export default function CartScreen({navigation}) {
 
+  const {data:posts} = useQuery({queryKey:['products'], queryFn:()=>getProducts()})
   
-  const [images,setImages] = useState(
-    [
-      "https://source.unsplash.com/1024x768/?nature",
-      "https://source.unsplash.com/1024x768/?water",
-      "https://source.unsplash.com/1024x768/?girl",
-      "https://source.unsplash.com/1024x768/?tree", // Network image
-      require('../assets/pic1.jpeg')
-      
-    ]
-  )
-  
-  const renderItem = ({item})=>{
-    return <Pressable w='100%' m={1} bg='white' rounded='md'
-    onPress={()=>navigation.navigate("ProductDetails",
-    {title:item.name,img:item.img})}>
+  const {searchPhrase,setClicked} = useContext(SearchContext);
 
-    <Center p={2} alignItems='center'  h={250} flex={1} >
-    <Box position={"relative"} py={1} my={1}
-    bg="white" borderBottomColor={'orange.300'} >
-        <Box bg='gray.50' p={2} rounded='md' w='98%'>
-        <Image resizeMode='cover' source={item.img} w={140} alt={''} 
-        bg='gray.300' m={1} h={150} />
-        <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
-        position={"absolute"} right={10} 
-        top={10}/>
-    </Box>
-    <Box p={1} mt={-1}>
-        <Text color='blueGray.600' letterSpacing='sm'>{item.name}</Text>
-    <Text fontSize={16} mt={2} fontWeight='bold' letterSpacing='sm'>Tzs {item.price}</Text>
-    </Box>
-    </Box>
-    </Center>
-    </Pressable>
+  const renderItem = ({item})=>{
+
+    if (searchPhrase === "") {
+      return <Pressable w={'49%'} m={1} bg='white' rounded={'md'}
+        onPress={()=>navigation.navigate("ProductDetails",{title:item.name,id:item._id,img:item?.image[0]})}>
+        <Center p={2} alignItems='center'  h={250} flex={1} >
+        <Box position={"relative"} py={1} my={1}
+        bg="white" borderBottomColor={'orange.300'} >
+          <Box bg='gray.10' p={2} rounded='md' w='98%'>
+            <Image resizeMode='cover' 
+            source={{uri:item?.image[0]}} w={150} alt={''} 
+            bg='gray.300' m={1} h={150} />
+            <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
+            position={"absolute"} right={10} 
+            top={10}/>
+        </Box>
+        <Box>
+          <Text color='blueGray.600' letterSpacing='sm'>{item.name}</Text>
+         <Text fontSize={16} mt={2} fontWeight='bold' letterSpacing='sm'>Tzs {item.price}</Text>
+        </Box>
+      </Box>
+      </Center>
+      </Pressable>
+    }
+    else if(item.name.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Pressable w={'49%'} m={1} bg='white' rounded={'md'}
+      onPress={()=>navigation.navigate("ProductDetails",{title:item.name,id:item._id,img:item?.image[0]})}>
+        <Center p={2} alignItems='center'  h={250} flex={1} >
+        <Box position={"relative"} py={1} my={1}
+        bg="white" borderBottomColor={'orange.300'} >
+          <Box bg='gray.10' p={2} rounded='md' w='98%'>
+            <Image resizeMode='cover' 
+            source={{uri:item?.image[0]}} w={150} alt={''} 
+            bg='gray.300' m={1} h={150} />
+            <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
+            position={"absolute"} right={10} 
+            top={10}/>
+        </Box>
+        <Box>
+          <Text color='blueGray.600' letterSpacing='sm'>{item.name}</Text>
+         <Text fontSize={16} mt={2} fontWeight='bold' letterSpacing='sm'>Tzs {item.price}</Text>
+        </Box>
+      </Box>
+      </Center>
+      </Pressable>
+    }
+    
   }
 
 
 
   return (
-    <Center flex={1}>
+    <Center flex={1}
+    onStartShouldSetResponder={() => {
+      setClicked(false);
+    }}
+    >
+      <ExpoStatusBar />
 
-  <FlatList w={"full"} flex={1}
-  _contentContainerStyle={{
-    justifyContent:'space-around',
-    alignItems:'center'
-  }}
-      
-      renderItem={renderItem}
-      data={data}
-      keyExtractor={item => item.id}
-      numColumns={2}
-      showsVerticalScrollIndicator={false}
-      _contentContainerStyle={{
-        backgroundColor:"white",
-        paddingBottom:20
-      }}
-      /> 
+
+      <FlatList bg='gray.100' w={"full"}
+        renderItem={renderItem}
+        data={posts?.data}
+        keyExtractor={item => item.id}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        _contentContainerStyle={{
+          paddingBottom:100,
+          width:'100%',
+          justifyContent:'center',
+          alignItems:'center'
+        }}
+        />
 
     </Center>
 

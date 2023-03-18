@@ -11,7 +11,6 @@ const userSlice  = createSlice({
     initialState,
     reducers:{
     _login:(state,action)=>{
-        // console.log("stare ===",state)
         return {...state,isLoggedIn:true,token:action.payload.token,user:action.payload.data}
     },
     _signup:(state,action)=>{
@@ -19,6 +18,7 @@ const userSlice  = createSlice({
 
     },
     _logout:(state)=>{
+        // alert(state)
         return {...state,isLoggedIn:false,user:{},token:null}
     }
 }

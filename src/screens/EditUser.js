@@ -2,9 +2,10 @@ import { Box, Button, Center, Heading, Input, Text } from 'native-base'
 import React, { useState } from 'react'
 
 import { useMutation } from 'react-query'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AuthDialog } from '../components/AuthDialog';
 import { signUp, updateUser } from '../data/api'
+import { _updateProfile } from '../features/userSlice';
 
 
 export default function EditUserScreen({navigation}) {
@@ -12,21 +13,30 @@ export default function EditUserScreen({navigation}) {
 
     const {token,user} = useSelector(state=>state.user);
     
+    const dispatch = useDispatch()
+
     const mutation = useMutation(updateUser,{
         onSuccess:(data)=>{
+            
             setIsOpen(!isOpen)
             if(data.status){
+
+                dispatch(_updateProfile(data.data))
                 navigation.navigate("Dashboard")            
             }
     }})
 
 
-    const [mobile,setMobile] = useState(user.mobile);
-    const [businesName,setBusinessName] = useState(user.busines_name);
-    const [businesNumber,setBusinessNumber] = useState(user.busines_mobile);
-    const [email,setEmail] = useState(user.email);
-    const [username,setUsername] = useState(user.name);
-    const [location,setBusinessLocation] = useState(user.email);
+    const _user = useSelector(state=>state.user)
+
+
+
+    const [mobile,setMobile] = useState(user?.mobile);
+    const [businesName,setBusinessName] = useState(user?.busines_name);
+    const [businesNumber,setBusinessNumber] = useState(user?.busines_mobile);
+    const [email,setEmail] = useState(user?.email);
+    const [username,setUsername] = useState(user?.name);
+    const [location,setBusinessLocation] = useState(user?.email);
 
 
     const handleSignup = ()=>{
@@ -35,9 +45,7 @@ export default function EditUserScreen({navigation}) {
 
         // setIsOpen(!isOpen)
         let data = {username,mobile,busines_name:businesName,busines_mobile:businesNumber,
-            email,location,token}
-            // alert(JSON.stringify(data))
-            // return;
+            email,location,token,id:user.id}
             mutation.mutate(data)
     }
 
@@ -108,10 +116,12 @@ export default function EditUserScreen({navigation}) {
             p={2}
         />
 
-
         
 
-        <Button m={2} onPress={handleSignup} fontWeight='bold' bg='amber.600'>UPDATE DETAILS</Button>
+        <Button m={2} onPress={handleSignup} 
+        fontWeight='bold' 
+        rounded='full'
+        bg='amber.600'>UPDATE DETAILS</Button>
 
         <AuthDialog isOpen={isOpen} setIsOpen={setIsOpen} />
 

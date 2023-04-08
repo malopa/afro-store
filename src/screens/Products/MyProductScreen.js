@@ -7,6 +7,7 @@ import Loader from '../../components/Loader';
 import { getMyPost } from '../../data/api';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import EmptyData from '../../components/EmptyData';
 
 export default function MyProductScreen({navigation}) {
   const [data,setData] = useState([]);
@@ -21,15 +22,16 @@ export default function MyProductScreen({navigation}) {
     {id:item._id})}>
 
     <Center p={2} alignItems='center'  h={250} flex={1} >
-    <Box position={"relative"} py={1} my={1}
-    bg="white" borderBottomColor={'orange.300'} >
-        <Box bg='gray.50' p={2} rounded='md' w='98%'>
-        <Image resizeMode='cover' source={{uri:item?.image[0]}} w={140} alt={''} 
-        bg='gray.300' m={1} h={150} />
-        <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
-        position={"absolute"} right={5} 
-        top={6}/>
-    </Box>
+      <Box position={"relative"} py={1} my={1}
+          bg="white" borderBottomColor={'orange.300'} >
+          <Box bg='gray.50' p={2} rounded='md' w='98%'>
+          <Image resizeMode='cover' 
+          source={{uri:item?.image[0]}} w={140} alt={''} 
+          bg='gray.300' m={1} h={150} />
+          <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
+          position={"absolute"} right={5} 
+          top={6}/>
+      </Box>
     <Box p={1} mt={-1}>
         <Text color='blueGray.600' letterSpacing='sm'>{item.name}</Text>
     <Text fontSize={16} mt={2} fontWeight='bold' 
@@ -40,22 +42,21 @@ export default function MyProductScreen({navigation}) {
     </Pressable>
   }
 
+
+
   return (
-    <Box >
-      <StatusBar backgroundColor='gold' />
-      <Heading pt={4} px={4} mt={4}>
-        <Text>My Products</Text>
-      </Heading>
+    <Box flex={1} bg='white'>
+      <StatusBar backgroundColor='black' />
 
     {isLoading?
       <ActivityIndicator size="large" />:
-
       <FlatList
       _contentContainerStyle={{paddingBottom:20}}
       numColumns={2}
       data={posts?.data}
       renderItem={renderMyPost}
       keyExtractor={item=>item._id}
+      ListEmptyComponent={<EmptyData />}
       />
     }
     </Box>

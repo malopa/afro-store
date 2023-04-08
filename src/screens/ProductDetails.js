@@ -1,24 +1,44 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons'
-import { Box,Pressable, Button, Center, FlatList, HStack, Icon, Image, Text } from 'native-base'
-import React, { useState } from 'react'
+import { Box,Pressable, Button, Center, FlatList, HStack, Icon, Image, Text, StatusBar } from 'native-base'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator } from 'react-native'
+import { Alert } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
+import EmptyData from '../components/EmptyData'
 import { getProductDetails } from '../data/api'
-
 
 
 export default function ProductDetails({route,navigation}) {
 
     const user = useSelector(state=>state.user);
-    
     let params = route.params 
-    const {data:details} = useQuery({queryKey:['products-detals'], queryFn:()=>getProductDetails(params.id)})
 
-    const [itemImg,setItem] = useState(route.params.img)
 
+    const queryClient = useQueryClient();
+
+    const [itemImg,setItem] = useState({uri:route.params.img})
+
+    const {isLoading,data:details} = useQuery(['products-detals',params?.id], ()=>getProductDetails(params.id))
+
+    useEffect(()=>{
+        if(params?.id){
+
+    // const focusHandler = navigation.addListener('focus', () => {
+    //     queryClient.invalidateQueries("products-detals")
+
+        setItem({uri:route.params.img})
+
+    // });
+    // return focusHandler
+
+        }
+    },[params?.id])
+  
     const renderImage = ({item})=>{
-        return <Pressable borderWidth={1} borderColor='gray.200' rounded='md' mx={2} onPress={()=>setItem(item.img)}>
+        return <Pressable borderWidth={1} py={2} px={2} borderColor='gray.200'
+         rounded='md' mx={2} onPress={()=>setItem({uri:item})}>
            <Image bg='gray.100' 
                 source={{uri:item}} 
                 alt='item' w={20}  h={20} resizeMode='cover' ml={2} /> 
@@ -27,28 +47,38 @@ export default function ProductDetails({route,navigation}) {
 
 
     const renderRelatedContent = ({item})=>{
-        return <Pressable rounded='md'  w={200} ml={2} 
-            onPress={()=>navigation.navigate("ProductDetails",{title:item.name,img:item.image[0]})}>
-            <Center  alignItems='center'  h={250} flex={1} bg='white'>
+        return <Pressable rounded='xl'   m={2} 
+            onPress={()=>navigation.navigate("ProductDetails",{id:item._id,title:item.name,img:item.image[0]})}>
+            <Center  alignItems='center' 
+            bg='white' rounded={'md'}>
                 <Box position={"relative"} py={1} my={1}
-                bg="white" borderBottomColor={'orange.300'} rounded={'md'}>
-                    <Box bg='white' p={2} rounded='md' w='100%'>
-                    <Image resizeMode='cover' source={details?.data?.image[0]} w={128} alt={''} bg='gray.300' 
+                bg="white" borderBottomColor={'orange.300'} 
+                rounded={'md'}>
+                    <Box bg='white' p={2} 
+                    rounded='md' 
+                    w='100%'>
+                    <Image resizeMode='cover' 
+                    source={{uri:item.image[0]}} 
+                    w={128} alt={''} 
+                    bg='gray.300' 
                     m={1} h={150} />
+                    
                     <Icon  as={<MaterialIcons name="favorite-border"/>} size={6} 
                     position={"absolute"} right={10} 
                     top={10}/>
                 </Box>
                     <Box>
+                        <Center>
                         <Text color='blueGray.600' letterSpacing='sm'>{item.name}</Text>
                         <Text fontSize={16} fontWeight='bold' letterSpacing='sm'>Tzs {item.price}</Text>
+                        </Center>
                     </Box>
+                    
                 </Box>
             </Center>
             </Pressable>
     }
 
-    // const user = useSelector(state=>state.user)
 
     const handleLoginStatus = ()=>{
         if(user){
@@ -66,23 +96,36 @@ export default function ProductDetails({route,navigation}) {
         }
     }   
 
+
+    if(isLoading){
+        return <Center flex={1}>
+            <Text>loading...</Text>
+            <ActivityIndicator size={40}/>
+        </Center>
+    }
+
   return (<ScrollView
-    showsVerticalScrollIndicator={false}
-    backgroundColor='white'
-    flex={1}
-  >
+        showsVerticalScrollIndicator={false}
+        backgroundColor='white'
+        flex={1}
+    >
 
-            <Box  p={4} h={250} flex={1} justifyContent='center' alignItems='center'>
+    <StatusBar backgroundColor={'black'}/>
 
-                <Image pt={4} 
-                resizeMode='cover' 
+            <Box flex={1} justifyContent='center' alignItems='center'>
+
+                <Image 
                 bg='gray.100' 
-                source={{uri:details?.data?.image[0]}} 
-                alt='item' w={200} h={200}
+                source={itemImg} 
+                resizeMode="contain"
+                alt='item' w={'100%'} 
+                h={350}
+                rounded='md'
                 />
 
+
             </Box>
-            <Box>
+            <Box p={4}>
             </Box>
             <Box bg='white' py={2} borderColor='gray.100'>
                 <FlatList bg='white'
@@ -90,6 +133,7 @@ export default function ProductDetails({route,navigation}) {
                     data={details?.data?.image}
                     renderItem={renderImage}
                     keyExtractor={item=>item.id}
+                    showsHorizontalScrollIndicator={false}
                 />
             </Box>
             <Box bg='#FFF' p={4}>
@@ -100,9 +144,12 @@ export default function ProductDetails({route,navigation}) {
                     <Text letterSpacing={.2} fontSize={18} fontWeight='bold'>TZS {details?.data?.price}</Text>
                 </Box>
 
-                <Text font='bold' color='gray.600' p={2}>Product status : {details?.data?.price}</Text>
+                <Box>{(details?.data?.description)}</Box>
+                {/* <Box>{(JSON.stringify(details?.data))}</Box> */}
 
-                <Pressable onPress={()=>navigation.navigate("ShoperScreen",{title:details?.data?.user?.name})}>
+                <Text font='bold' color='gray.600' p={2}>Product status : {details?.data?.condition}</Text>
+
+                <Pressable onPress={()=>navigation.navigate("ShoperScreen",{title:details?.data?.user?.name,user:details?.data?.user})}>
                     <Text font='bold' color='gray.800' underline={true} p={2} py={1} >More about provider <Icon name={<FontAwesome name='angle-right' />} size={6} /> </Text>
                 </Pressable>
                 
@@ -126,7 +173,8 @@ export default function ProductDetails({route,navigation}) {
             <Box mt={4}>
                 <Text fontWeight='bold' px={2} my={4} fontSize={18}>Related Content</Text></Box>
 
-{/* <Box>{JSON.stringify(details)}</Box> */}
+
+
 
             <FlatList p={2} bg='amber.100'
                 data={details?.related} 
@@ -134,6 +182,7 @@ export default function ProductDetails({route,navigation}) {
                 renderItem={renderRelatedContent}
                 keyExtractor={item=>item.id}
                 showsHorizontalScrollIndicator={false}
+                ListEmptyComponent={<EmptyData />}
             /> 
           </ScrollView>
   )

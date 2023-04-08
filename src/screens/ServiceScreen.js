@@ -30,7 +30,7 @@ export default function ServiceScreen() {
 
         <FlatList
             _contentContainerStyle={{paddingBottom:16}}
-            data = {data}
+            data={data}
             renderItem={renderItem}
             keyExtractor={item=>item.id}
             showsVerticalScrollIndicator={false}

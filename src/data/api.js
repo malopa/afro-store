@@ -1,6 +1,7 @@
 // export const BASE_URL = 'http://192.168.1.25:3005/api/v1/';
-// export const BASE_URL = 'http://192.168.1.102:3005/api/v1/';
+// export const BASE_URL = 'http://192.168.224.166:3005/api/v1/';
 export const BASE_URL = 'http://afrobuy.shop:3000/api/v1/';
+
 // export const BASE_URL = 'http://192.168.43.253:3005/api/v1/';
 
 
@@ -18,6 +19,44 @@ export const signUp = async  (data)=>{
 }
 
 
+export const getProductByCategory = async (slug)=>{
+    const config = {
+		headers:{
+            'Content-Type':"application/json",
+        }
+	}
+
+	const {data} = await axios.get(`${BASE_URL}product/category/${slug}`,config)	
+	return data;
+}
+
+
+
+
+export const getProductBySlug = async (slug)=>{
+    const config = {
+		headers:{
+            'Content-Type':"application/json",
+        }
+	}
+
+	const {data} = await axios.get(`${BASE_URL}product/category/${slug}/category`,config)	
+	return data;
+}
+
+
+
+export const getPromotedPost = async (level)=>{
+	const config = {
+		headers:{
+            'Content-Type':"application/json",
+        }
+	}
+	const {data} = await axios.get(`${BASE_URL}product/promoted/${level}`,config)	
+	return data;
+}
+
+
 export const getMyPost = async (token)=>{
 	const config = {
 
@@ -26,16 +65,44 @@ export const getMyPost = async (token)=>{
             'Authorization':'Bearer ' + token}
 	}
 	const {data} = await axios.get(`${BASE_URL}product/user`,config)	
-    console.log("===data==",data);
 
 	return data;
 }
 
 
+export const getShoperDetails = async (id)=>{
+	const config = {
+
+		headers:{
+            'Content-Type':"application/json",
+        }
+	}
+	const {data} = await axios.get(`${BASE_URL}product/user/${id}`,config)	
+
+	return data;
+}
+
 
 export const getProducts = async (limit,skip)=>{
 	const {data} = await axios.get(`${BASE_URL}product?limit=${limit}&skip=${skip}`)	
 	return data;
+}
+
+
+
+export const _promoteProduct = async (data)=>{
+
+    const res  = await fetch(`${BASE_URL}product/promote`,{
+        headers:{
+            'Content-Type':'application/json'
+        },
+        method:"POST",
+        body:JSON.stringify(data)
+    });
+
+    const body = await res.json()
+    return body;
+
 }
 
 
@@ -88,8 +155,9 @@ export const getCategories = async (data)=>{
 }
 
 export const updateUser = async (data)=>{
+
     try{
-        const res  = await fetch(`${BASE_URL}user`,{
+        const res  = await fetch(`${BASE_URL}user/`,{
             headers:{
                 'Content-Type':'application/json',
                 "Authorization":"Bearer "+data.token
@@ -98,11 +166,8 @@ export const updateUser = async (data)=>{
             body:JSON.stringify(data)
         });
     
-        console.log("log data===",body)
-
+    
         const body = await res.json()
-        console.log("log data===",body)
-        // alert(JSON.stringify(body))
 
         return body;
 

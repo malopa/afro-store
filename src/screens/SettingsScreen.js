@@ -1,10 +1,10 @@
 import { Box, Center, Divider, HStack, Icon, Text } from 'native-base'
-import React from 'react'
+import React, { useEffect } from 'react'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import { Pressable } from 'react-native';
+import { Alert, BackHandler, Pressable } from 'react-native';
 import { AntDesign, Entypo } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import {useQuery} from 'react-query';
@@ -23,7 +23,6 @@ export default function SettingsScreen({navigation}) {
 
 	const handleLogout = ()=>{
         dispatch(_logout())
-
 		return navigation.navigate("Login");
 	}
 
@@ -32,37 +31,67 @@ export default function SettingsScreen({navigation}) {
             if(user.isLoggedIn){
                 navigation.navigate("EditUserScreen")
             }else{
-                navigation.navigate("QuickSignup")
+                navigation.navigate("Login")
             }
         }
     }
 
 
+    useEffect(() => {
+        const backAction = () => {
+          Alert.alert('Hold on!', 'Are you sure you want to Exit?', [
+            {
+              text: 'Cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {text: 'YES', onPress: () => BackHandler.exitApp()},
+          ]);
+          return true;
+        };
+    
+        const backHandler = BackHandler.addEventListener(
+          'hardwareBackPress',
+          backAction,
+        );
+    
+        return () => backHandler.remove();
+      }, []);
+
+
     const addProduct = ()=>{
 
+        if(!user.isLoggedIn){
+            navigation.navigate("MyProduct")
+        }
+
         if(user){
-            if(user.user.busines_mobile){
+            if(user.user?.busines_mobile){
                 navigation.navigate("AddProduct")
             }else{
-                navigation.navigate("QuickSignup")
+                navigation.navigate("EditUserScreen")
             }
-        }else{
-            navigation.navigate("Login")
         }
+        
 
     }
 
 
     const handleMyPost = ()=>{
 
+        if(!user.isLoggedIn){
+               navigation.navigate("MyProduct")
+        }
+
         if(user){
-            if(user.user.busines_mobile){
-                navigation.navigate("MyProduct")
+            if(user?.user?.busines_mobile){
+               navigation.navigate("MyProduct")
             }else{
-                navigation.navigate("Login")
+
+                navigation.navigate("EditUserScreen")
             }
         }else{
-            navigation.navigate("Login")
+           navigation.navigate("Login")
         }
     }
 
@@ -74,10 +103,13 @@ export default function SettingsScreen({navigation}) {
                 color={'gray'} size={8} />
             </Box>
 
+    {/* {JSON.stringify(user)} */}
 	  <Box>
+
+
 	  </Box>
-            <Text color="gray.500" fontSize={16}>{user?.user?.name}</Text>
-            <Text color="gray.600" fontSize={16}>{user?.user?.email}</Text>
+            <Text color="gray.500" fontSize={14}>{user?.user?.mobile}</Text>
+            <Text color="gray.600" fontSize={18}>{user?.user?.name}</Text>
             </Center>
             <Divider _light={{bg:'gray.100'}} mt={8}/>
             <Pressable onPress={handleMyPost}>

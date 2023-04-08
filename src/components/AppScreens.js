@@ -31,7 +31,10 @@ export default function AppScreens({navigation}) {
         <Stack.Screen name='Dashboard' component={MainApp} />
         <Stack.Screen name='ProductDetails' 
         component={ProductDetails} 
-        options={({route})=>({title:route.params.title})} />
+        options={({route})=>({headerShown: true,
+          headerTransparent: true,title:route.params.title,headerTitleStyle: {
+            color: 'white'
+          }})} />
 
       <Stack.Screen name='ShoperScreen' 
         component={ShoperScreen} 
@@ -112,7 +115,7 @@ export default function AppScreens({navigation}) {
 
     <Stack.Screen name='MyProduct' 
         component={MyProductScreen} 
-        options={({route})=>({title:"My Products"})} />
+        options={({route})=>({title:"My Products",headerShown:true})} />
     </Stack.Navigator>
 
    

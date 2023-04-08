@@ -58,8 +58,6 @@ export default function AddProductScreen({navigation}) {
         aspect: [4, 3],
         quality: 1,
       });
-  
-
 
       let img = result.assets.map(r=>{
         // console.log(r)
@@ -81,7 +79,7 @@ export default function AddProductScreen({navigation}) {
         formData.append("img[]",im)
         set_Image(p=>[...p,im]);
         
-        return r.uri
+        return im
       
       })
 

@@ -17,6 +17,9 @@ const userSlice  = createSlice({
         return {...state,isLoggedIn:true,user:action.payload}
 
     },
+     _updateProfile:(state,action)=>{
+        return {...state,isLoggedIn:true,user:action.payload.data}
+    },
     _logout:(state)=>{
         // alert(state)
         return {...state,isLoggedIn:false,user:{},token:null}
@@ -25,6 +28,6 @@ const userSlice  = createSlice({
 })
 
 
-export const {_login,_logout,_signup}  = userSlice.actions
+export const {_login,_logout,_signup,_updateProfile}  = userSlice.actions
 
 export default userSlice.reducer;

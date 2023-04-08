@@ -33,11 +33,11 @@ export default function MainApp({navigation}) {
       activeColor="#f0edf6"
       inactiveColor="#3e2465"
       headerShown={false}
-      barStyle={{ paddingBottom: 4,height: 80 }}
+      barStyle={{ paddingBottom:4,height: 80 }}
 
       screenOptions={{
         tabBarStyle: { position: 'absolute' },
-        tabBarActiveTintColor: '#ffed62',
+        tabBarActiveTintColor: 'black',
       }}
 
       tabContainerStyle={{

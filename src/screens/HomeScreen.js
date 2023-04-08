@@ -4,7 +4,7 @@ import React from 'react'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import MainScreen from './MainScreen';
 import ElectronicsScreen from './ElectronicsScreen';
-import { Box, HStack, Icon, Text } from 'native-base';
+import { Box, HStack, Icon, Image, Text } from 'native-base';
 import { MaterialIcons } from '@expo/vector-icons';
 import OtherScreen from './categories/OtherScreen';
 import LapcomputerScreen from './categories/LapcomputerScreen';
@@ -52,23 +52,44 @@ export default function HomeScreen() {
       }
     }}
     drawerContent={(props) => <CustomDrawerContent {...props} />}>
-    <Drawer.Screen name="Dashboard" options={{title:'Gold',headerTitleAlign:"center"}} component={MainScreen} />
-      <Drawer.Screen name="Electronics" component={ElectronicsScreen} />
-      <Drawer.Screen name="Laptop & Computer" component={LapcomputerScreen} />
-      <Drawer.Screen name="Clothes & Jewels" component={ClothJewelScreen} />
-      <Drawer.Screen name="House & Real Estate" component={HouseEstateScreen} />
-      <Drawer.Screen name="Funirtures" component={FunirtureScreen} />
-      <Drawer.Screen name="Mobile phone & Accessories" component={MobilePhoneScreen} />
-      <Drawer.Screen name="Cars & Spares" component={Carspares} />
-      <Drawer.Screen name="Food Products" component={Carspares} />
+    <Drawer.Screen name="Dashboard" 
+    options={{slug:'ElectronicsScreen',headerTitle: () => (
+      <Image rounded='full' alt='' 
+      style={{ width: 50, height: 50 }} 
+      source={require("../../assets/icon.png")} />
+    ),headerTitleAlign:"center"}} component={MainScreen} />
+      <Drawer.Screen name="Electronics" 
+      component={ElectronicsScreen}
+      initialParams={{slug:'ElectronicsScreen'}} 
+      />
+      <Drawer.Screen name="Laptop & Computer" 
+      component={ElectronicsScreen} 
+      initialParams={{slug:'LapcomputerScreen'}} 
+      
+      />
+      <Drawer.Screen name="Clothes & Jewels" component={ElectronicsScreen} 
+      initialParams={{slug:'ClothJewelScreen'}} 
+      
+      />
+      <Drawer.Screen name="House & Real Estate" component={ElectronicsScreen} 
+      initialParams={{slug:'HouseEstateScreen'}} 
+      />
+      <Drawer.Screen name="Funirtures" component={ElectronicsScreen} 
+      initialParams={{slug:'Funirtures'}}
+      />
+      <Drawer.Screen name="Mobile phone & Accessories" component={MobilePhoneScreen} 
+      initialParams={{slug:'MobilePhoneAccessories'}}
+      />
+      <Drawer.Screen name="Cars & Spares" component={Carspares} 
+      initialParams={{slug:'Cars'}}
+      
+      />
+      <Drawer.Screen name="Hardware & building materials" component={ElectronicsScreen} 
+      initialParams={{slug:'HardWare'}}
+      
+      />
       <Drawer.Screen name="Others" component={OtherScreen} />
        
-      
-      
-      
-      
-      
-      
     </Drawer.Navigator>
 
     
